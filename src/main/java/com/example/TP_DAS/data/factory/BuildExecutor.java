@@ -1,7 +1,7 @@
 package com.example.TP_DAS.data.factory;
 
 import com.example.TP_DAS.data.singleton.BuildRequest;
-import com.example.TP_DAS.data.singleton.BuildResult;
+import com.example.TP_DAS.data.observer.BuildResult;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -20,13 +20,17 @@ public class BuildExecutor {
     }
 
     public BuildResult executeBuild(BuildRequest request) throws InterruptedException, IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder("gcc", "-Wall", "-o", request.getProjectId(), request.getSourceCode()); // Create the process builder instance
+
         Future<BuildResult> future = executorService.submit(() -> {
+            Process process = null;
             try {
-                // Perform the actual build process
+                // Start the build process
+                process = processBuilder.start();
                 System.out.println("Building project with ID: " + request.getProjectId());
                 Thread.sleep(5000); // Simulate build execution time
 
-                if (checkBuildSuccess()) {
+                if (checkBuildSuccess(process)) {
                     return new BuildResult(request.getProjectId(), true, "Build successful");
                 } else {
                     return new BuildResult(request.getProjectId(), false, "Build failed");
@@ -34,6 +38,11 @@ public class BuildExecutor {
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return new BuildResult(request.getProjectId(), false, "Build interrupted");
+            } finally {
+                // Cleanup the process
+                if (process != null) {
+                    process.destroy();
+                }
             }
         });
 
@@ -52,9 +61,20 @@ public class BuildExecutor {
         return executorService;
     }
 
-    private boolean checkBuildSuccess() {
-        // Implement logic to check if the build was successful
-        // For example, you could check if the build output contains any errors
+    private boolean checkBuildSuccess(Process process) {
+        // Check for error messages in the build output
+        String buildOutput = process.getInputStream().toString();
+        if (buildOutput.contains("error")) {
+            return false;
+        }
+
+        // Check the exit code of the build process
+        int exitCode = process.exitValue();
+        if (exitCode != 0) {
+            return false;
+        }
+
+        // If both checks pass, the build is considered successful
         return true;
     }
 }

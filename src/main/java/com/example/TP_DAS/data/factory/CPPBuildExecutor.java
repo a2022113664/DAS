@@ -1,7 +1,7 @@
 package com.example.TP_DAS.data.factory;
 
 import com.example.TP_DAS.data.singleton.BuildRequest;
-import com.example.TP_DAS.data.singleton.BuildResult;
+import com.example.TP_DAS.data.observer.BuildResult;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
