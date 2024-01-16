@@ -4,4 +4,6 @@ public interface BuildRequestInterface {
     String getProjectId();
     String getSourceCode();
     String getBuildConfiguration();
+
+    String getLanguage();
 }

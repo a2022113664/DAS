@@ -7,6 +7,7 @@ public class BuildRequest implements BuildRequestInterface {
     private String sourceCode;
     private String buildConfiguration;
     private String buildOutput;
+    private String language;
 
     public BuildRequest(String projectId, String sourceCode, String buildConfiguration) {
         this.projectId = projectId;
@@ -31,6 +32,10 @@ public class BuildRequest implements BuildRequestInterface {
 
     public String getBuildOutput() {
         return buildOutput;
+    }
+
+    public String getLanguage() {
+        return language;
     }
 
     // Method to set the build output
