@@ -1,6 +1,6 @@
 package com.example.TP_DAS.data.controller;
 
-import com.example.TP_DAS.data.observer.BuildResult;
+import com.example.TP_DAS.data.BuildResult;
 import com.example.TP_DAS.data.observer.BuildResultSubject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/builds/{projectId}/results")
+@RequestMapping("/build/{projectId}/results")
 public class BuildResultController {
 
     private BuildResultSubject resultSubject;
@@ -19,17 +19,12 @@ public class BuildResultController {
         this.resultSubject = new BuildResultSubject();
     }
 
-    @GetMapping
+    //@GetMapping("/{projectId}/results")
     public BuildResult getBuildResult(@PathVariable String projectId) {
-        try {
-            BuildResult result = resultSubject.getBuildResult(projectId);
-            if (result == null) {
-                return new BuildResult(projectId, false, "Build result not found");
-            }
-            return result;
-        } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
-            return null;
+        BuildResult result = resultSubject.getBuildResult(projectId);
+        if (result == null) {
+            return new BuildResult(projectId, false, "Build result not found");
         }
+        return result;
     }
 }

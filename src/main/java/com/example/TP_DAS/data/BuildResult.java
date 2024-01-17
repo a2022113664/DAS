@@ -1,8 +1,7 @@
-package com.example.TP_DAS.data.singleton;
+package com.example.TP_DAS.data;
 
-import com.example.TP_DAS.model.interfaces.BuildResultInterface;
+public class BuildResult {
 
-public class BuildResult implements BuildResultInterface {
     private String projectId;
     private boolean success;
     private String message;

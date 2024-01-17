@@ -1,7 +1,7 @@
 package com.example.TP_DAS.model.interfaces;
 
-import com.example.TP_DAS.data.observer.BuildResult;
+import com.example.TP_DAS.data.BuildResult;
 
 public interface BuildResultObserver {
-    void update(BuildResult result);
+    void updateBuildResult(BuildResult result);
 }
