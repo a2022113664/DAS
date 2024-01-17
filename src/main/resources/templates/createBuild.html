@@ -11,7 +11,7 @@
 <div class="container">
     <h1 class="h2 text-center my-4">Submit Build Request</h1>
 
-    <form id="build-form" class="needs-validation" action="/build" method="POST">
+    <form id="compileBuild-form" class="needs-validation" action="/builds/compileBuild" method="POST">
         <div class="row mb-3">
             <label for="projectId" class="col-sm-2 col-form-label">Project ID:</label>
             <div class="col-sm-10">
@@ -32,7 +32,7 @@
         </div>
 
         <div class="row mb-3">
-            <label for="sourceCode" class="col-sm-2 col-form-label">Source Code File:</label>
+            <label for="sourceCodeFile" class="col-sm-2 col-form-label">Source Code File:</label>
             <div class="col-sm-10">
                 <input type="file" id="sourceCodeFile" name="sourceCodeFile" required>
             </div>
@@ -46,8 +46,8 @@
         </div>
 
         <div class="d-flex justify-content-between my-4">
-            <button type="submit" class="btn btn-primary">Submit Build</button>
             <a href="#" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Submit Build</button>
         </div>
     </form>
 </div>

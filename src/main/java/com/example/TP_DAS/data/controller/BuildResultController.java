@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/build/{projectId}/results")
+//@RequestMapping("/build/{projectId}/results")
 public class BuildResultController {
 
     private BuildResultSubject resultSubject;
