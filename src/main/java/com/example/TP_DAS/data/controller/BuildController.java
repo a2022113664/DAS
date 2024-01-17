@@ -21,7 +21,7 @@ public class BuildController {
     private BuildExecutorFactory executorFactory;
 
     public BuildController() {
-        this.buildQueue = new BuildQueue();
+        this.buildQueue = BuildQueue.getInstance();
         this.resultSubject = new BuildResultSubject();
         this.executorFactory = new BuildExecutorFactory();
     }

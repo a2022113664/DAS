@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RestController
-//@RequestMapping("/build/{projectId}/results")
+@RequestMapping("/builds/{projectId}")
 public class BuildResultController {
 
     private BuildResultSubject resultSubject;
@@ -19,9 +19,11 @@ public class BuildResultController {
         this.resultSubject = new BuildResultSubject();
     }
 
-    //@GetMapping("/{projectId}/results")
+    @GetMapping("/results")
     public BuildResult getBuildResult(@PathVariable String projectId) {
+
         BuildResult result = resultSubject.getBuildResult(projectId);
+
         if (result == null) {
             return new BuildResult(projectId, false, "Build result not found");
         }

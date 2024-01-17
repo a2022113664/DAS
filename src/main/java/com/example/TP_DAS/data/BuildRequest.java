@@ -8,6 +8,7 @@ public class BuildRequest {
     private String language;
     private File sourceCodeFile;
     private String buildConfiguration;
+    private String sourceFileName;
 
     public BuildRequest(String projectId, String language, String buildConfiguration, File sourceCodeFile) {
         this.projectId = projectId;
@@ -38,6 +39,10 @@ public class BuildRequest {
         }
 
         return sourceCodeFile;
+    }
+
+    public String getSourceFileName(){
+        return this.sourceCodeFile.getName();
     }
 
     public void setSourceCodeFile(File sourceCodeFile) {
