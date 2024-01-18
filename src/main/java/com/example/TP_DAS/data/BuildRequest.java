@@ -45,6 +45,9 @@ public class BuildRequest {
         return this.sourceCodeFile.getName();
     }
 
+    public String getSourceFilePath(){
+        return this.sourceCodeFile.getAbsolutePath();
+    }
     public void setSourceCodeFile(File sourceCodeFile) {
         this.sourceCodeFile = sourceCodeFile;
     }

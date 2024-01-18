@@ -4,9 +4,7 @@ import com.example.TP_DAS.data.BuildRequest;
 import com.example.TP_DAS.model.interfaces.BuildExecutor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +18,7 @@ public class CCompilerExecutor implements BuildExecutor {
 
     public void configure(String projectId, String language, String buildConfiguration, File sourceCodeFile) {
         // Extract compiler path from system environment variables
-        compilerPath = System.getenv("CC");
+        compilerPath = System.getenv("CC");;
 
         // Check if the source code file is provided
         if (sourceCodeFile != null) {
@@ -36,10 +34,10 @@ public class CCompilerExecutor implements BuildExecutor {
             }
 
             // Convert the list of relative file paths to absolute paths
-            List<String> absoluteSourceFilePaths = new ArrayList<>();
-            for (String filePath : sourceFilePaths) {
-                absoluteSourceFilePaths.add(new File(sourceCodeFilePath).toPath().resolve(filePath).toAbsolutePath().toString());
-            }
+           // List<String> absoluteSourceFilePaths = new ArrayList<>();
+           // for (String filePath : sourceFilePaths) {
+           //     absoluteSourceFilePaths.add(new File(sourceCodeFilePath).toPath().resolve(filePath).toAbsolutePath().toString());
+           // }
 
             // Specify the output file path
             outputFilePath = projectId + ".out";
@@ -48,23 +46,46 @@ public class CCompilerExecutor implements BuildExecutor {
             System.out.println("Error: Source code file not specified.");
         }
     }
-
     @Override
     public void executeBuild(BuildRequest request) throws IOException, InterruptedException {
-        // Build the source code files into an executable file
-        String compilerCommand = String.join(" ", compilerArgs);
-        ProcessBuilder builder = new ProcessBuilder().command(compilerPath, compilerCommand);
-        builder.directory(new File("."));
+        if (compilerPath != null) {
+            // Construct the command line
+            String compilerCommand = "gcc";
+            String sourceFilePath = sourceFilePaths.get(0);
 
-        // Execute the compiler as a subprocess
-        Process process = builder.start();
+            // Add individual elements to the command list
+            List<String> commandList = new ArrayList<>();
+            commandList.add(compilerCommand);
 
-        // Read and discard the compiler's output
-        try (InputStream inputStream = process.getInputStream()) {
-            IOUtils.copy(inputStream, System.out);
+            // Check if compilerArgs is not empty
+            if (!compilerArgs.isEmpty()) {
+                commandList.addAll(compilerArgs);
+            }
+
+            commandList.add(sourceFilePath);
+            commandList.add("-o");
+            commandList.add(outputFilePath);
+
+            ProcessBuilder builder = new ProcessBuilder().command(commandList);
+            builder.directory(new File("."));
+
+            try {
+                Process process = builder.start();
+
+                // Capture and handle compiler output
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                }
+
+                // Wait for the compiler to finish
+                process.waitFor();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Error: Compiler path is not specified.");
         }
-
-        // Wait for the compiler to finish
-        process.waitFor();
     }
 }

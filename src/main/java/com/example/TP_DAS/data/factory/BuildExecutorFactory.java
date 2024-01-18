@@ -20,11 +20,12 @@ public class BuildExecutorFactory {
         return executorFactories.get(type);
     }
 
-    public BuildExecutor getBuildExecutor(BuildRequest request) throws IOException {
+    public BuildExecutor getBuildExecutor(BuildRequest request) throws IOException, InterruptedException {
         // Create the appropriate executor based on the requested language
         BuildExecutorType executorType = getExecutorType(request.getLanguage());
         BuildExecutor executor = executorType.createExecutor();
         executor.configure(request.getProjectId(), request.getLanguage(), request.getBuildConfiguration(), request.getSourceCodeFile());
+        executor.executeBuild(request);
 
         return executor;
     }

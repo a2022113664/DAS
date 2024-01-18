@@ -36,7 +36,7 @@ public class BuildController {
             // Submit the build request to the executor and add it to the queue
             buildQueue.add(new BuildTask(executor, request));
             buildQueue.completeBuild(request);
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
