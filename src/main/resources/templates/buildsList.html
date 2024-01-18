@@ -22,35 +22,8 @@
     </style>
 </head>
 <body>
-<<<<<<< Updated upstream
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Compiler</th>
-        <th>Build Configuration (-o)</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="project : ${allBuilds}">
-        <td th:text="${project.projectId}"></td>
-        <td th:text="${project.language}"></td>
-        <td th:text="${project.sourceCodeFile}"></td>
-        <td th:text="${project.buildConfiguration}"></td>
-        <td>
-            <a th:href="@{'/builds/' + ${project.projectId} + '/results'}">
-                <button>Build</button>
-            </a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-=======
 <div class="container">
     <h1 class="text-center mb-4">Builds List</h1>
->>>>>>> Stashed changes
 
     <table>
         <thead>
@@ -58,7 +31,7 @@
             <th>ID</th>
             <th>Language</th>
             <th>Source Code</th>
-            <th>Build Configuration</th>
+            <th>Build Configuration (-o)</th>
             <th>Actions</th>
         </tr>
         </thead>
