@@ -17,8 +17,13 @@ public class BuildFormController {
     public BuildFormController(){
         this.allBuilds = BuildQueue.getInstance();
     }
-    @GetMapping("/create")
+
+    @GetMapping("/index")
     public String index(Model model) {
+        return "index";
+    }
+    @GetMapping("/create")
+    public String create(Model model) {
         return "createBuild";
     }
 
@@ -38,5 +43,10 @@ public class BuildFormController {
         model.addAttribute("allBuilds", allCompiledBuilds);
 
         return "buildsList";
+    }
+
+    @GetMapping("/results")
+    public String results(Model model) {
+        return "buildsResult";
     }
 }
