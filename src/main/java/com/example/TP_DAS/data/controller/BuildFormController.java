@@ -45,8 +45,9 @@ public class BuildFormController {
         return "buildsList";
     }
 
-    @GetMapping("/results")
-    public String results(Model model) {
-        return "buildsResult";
+    // Foi para testar a página
+    @GetMapping("/result")
+    public String result(Model model) {
+        return "buildResult";
     }
 }
