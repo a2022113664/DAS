@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,11 +13,9 @@
 
     <div class="card" style="width: 100%;">
         <ul class="list-group list-group-flush">
-            <li class="list-group-item">Project ID: <span></span></li>
-            <li class="list-group-item">Language: <span></span></li>
-            <li class="list-group-item">Source Code: <span></span></li>
-            <li class="list-group-item">Build Configuration (-o): <span></span></li>
-            <li class="list-group-item">Status: <span></span></li>
+            <li class="list-group-item">Project ID: <span th:text="${result.projectId}"></span></li>
+            <li class="list-group-item">Sucess: <span th:text="${result.success}"></span></li>
+            <li class="list-group-item">Message: <span th:text="${result.message}"></span></li>
         </ul>
     </div>
 

@@ -44,10 +44,4 @@ public class BuildFormController {
 
         return "buildsList";
     }
-
-    // Foi para testar a página
-    @GetMapping("/result")
-    public String result(Model model) {
-        return "buildResult";
-    }
 }

@@ -1,6 +1,8 @@
 package com.example.TP_DAS.data.singleton;
 
 import com.example.TP_DAS.data.BuildRequest;
+import com.example.TP_DAS.data.BuildResult;
+import com.example.TP_DAS.data.observer.BuildResultSubject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +13,17 @@ public class BuildQueue {
 
     private static BuildQueue instance = new BuildQueue();
 
-    private BlockingQueue<BuildTask> queue = new LinkedBlockingQueue<>();
+    private BlockingQueue<BuildRequest> queue = new LinkedBlockingQueue<>();
 
     private List<BuildRequest> completedBuilds;
 
+    private BuildResultSubject buildResultSubject;
+
+
     public BuildQueue() {
         completedBuilds = new ArrayList<>();
+        this.buildResultSubject = new BuildResultSubject();
+
     }
 
     public static BuildQueue getInstance() {
@@ -27,11 +34,11 @@ public class BuildQueue {
 
     }
 
-    public void add(BuildTask task) {
-        queue.add(task);
+    public void add(BuildRequest request) {
+        queue.add(request);
     }
 
-    public BuildTask poll() {
+    public BuildRequest poll() {
         return queue.poll();
     }
 
@@ -41,5 +48,13 @@ public class BuildQueue {
 
     public List<BuildRequest> getCompletedBuilds() {
         return completedBuilds;
+    }
+
+    public void addResult(BuildResult result){
+        this.buildResultSubject.publishBuildResult(result);
+    }
+
+    public BuildResult getResults(String projectId){
+      return buildResultSubject.getBuildResult(projectId);
     }
 }

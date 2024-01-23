@@ -26,7 +26,6 @@ public class BuildExecutorFactory {
         BuildExecutor executor = executorType.createExecutor();
         executor.configure(request.getProjectId(), request.getLanguage(), request.getBuildConfiguration(), request.getSourceCodeFile());
         executor.executeBuild(request);
-
         return executor;
     }
 

@@ -1,5 +1,6 @@
 package com.example.TP_DAS.data.observer;
 
+import com.example.TP_DAS.data.BuildRequest;
 import com.example.TP_DAS.data.BuildResult;
 import com.example.TP_DAS.model.interfaces.BuildResultObserver;
 
@@ -12,8 +13,12 @@ public class BuildResultSubject {
 
     private List<BuildResultObserver> observers = new ArrayList<>();
 
-    private Map<String, BuildResult> results = new HashMap<>();
+    private List<BuildResult> results;
 
+
+    public BuildResultSubject(){
+        results = new ArrayList<>();
+    }
     public void addBuildResultObserver(BuildResultObserver observer) {
         observers.add(observer);
     }
@@ -23,7 +28,7 @@ public class BuildResultSubject {
     }
 
     public void publishBuildResult(BuildResult result) {
-        results.put(result.getProjectId(), result);
+        results.add(result);
 
         for (BuildResultObserver observer : observers) {
             observer.updateBuildResult(result);
@@ -31,6 +36,11 @@ public class BuildResultSubject {
     }
 
     public BuildResult getBuildResult(String projectId) {
-        return results.get(projectId);
+        for (BuildResult result : results) {
+            if (result.getProjectId().equals(projectId)) {
+                return result;
+            }
+        }
+        return null;
     }
 }

@@ -1,7 +1,11 @@
 package com.example.TP_DAS.data.factory;
 
 import com.example.TP_DAS.data.BuildRequest;
+import com.example.TP_DAS.data.BuildResult;
+import com.example.TP_DAS.data.observer.BuildResultSubject;
+import com.example.TP_DAS.data.singleton.BuildQueue;
 import com.example.TP_DAS.model.interfaces.BuildExecutor;
+import com.example.TP_DAS.model.interfaces.BuildResultObserver;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 
 import java.io.*;
@@ -16,6 +20,12 @@ public class CCompilerExecutor implements BuildExecutor {
     private List<String> sourceFilePaths;
     private String outputFilePath;
 
+    private BuildQueue buildQueue;
+    private BuildResultSubject buildResultSubject = new BuildResultSubject();
+
+    public CCompilerExecutor(){
+        this.buildQueue = BuildQueue.getInstance();
+    }
     public void configure(String projectId, String language, String buildConfiguration, File sourceCodeFile) {
         // Extract compiler path from system environment variables
         compilerPath = System.getenv("CC");;
@@ -40,7 +50,7 @@ public class CCompilerExecutor implements BuildExecutor {
            // }
 
             // Specify the output file path
-            outputFilePath = projectId + ".out";
+            outputFilePath = projectId;
         } else {
             // Handle the case where source code file is not provided
             System.out.println("Error: Source code file not specified.");
@@ -48,7 +58,8 @@ public class CCompilerExecutor implements BuildExecutor {
     }
     @Override
     public void executeBuild(BuildRequest request) throws IOException, InterruptedException {
-        if (compilerPath != null) {
+
+        try {
             // Construct the command line
             String compilerCommand = "gcc";
             String sourceFilePath = sourceFilePaths.get(0);
@@ -66,26 +77,23 @@ public class CCompilerExecutor implements BuildExecutor {
             commandList.add("-o");
             commandList.add(outputFilePath);
 
-            ProcessBuilder builder = new ProcessBuilder().command(commandList);
+            ProcessBuilder builder = new ProcessBuilder(commandList);
             builder.directory(new File("."));
 
-            try {
-                Process process = builder.start();
+            Process process = builder.start();
+            String outputError = new String(process.getErrorStream().readAllBytes());
+            process.waitFor();
+            BuildResult result;
 
-                // Capture and handle compiler output
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
-                }
-
-                // Wait for the compiler to finish
-                process.waitFor();
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
+            if(outputError.equals("")){
+                result = new BuildResult(request.getProjectId(), true, outputError);
+            }else{
+                result = new BuildResult(request.getProjectId(), false, outputError);
             }
-        } else {
-            System.out.println("Error: Compiler path is not specified.");
+            this.buildQueue.addResult(result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.example.TP_DAS.data.factory;
 
 import com.example.TP_DAS.data.BuildRequest;
+import com.example.TP_DAS.data.BuildResult;
+import com.example.TP_DAS.data.observer.BuildResultSubject;
 import com.example.TP_DAS.model.interfaces.BuildExecutor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 
@@ -15,6 +17,7 @@ public class CPlusPlusCompilerExecutor implements BuildExecutor {
     private List<String> compilerArgs = new ArrayList<>();
     private List<String> sourceFilePaths;
     private String outputFilePath;
+    private BuildResultSubject buildResultSubject = new BuildResultSubject();
 
     public void configure(String projectId, String language, String buildConfiguration, File sourceCodeFile) {
         // Extract compiler path from system environment variables
@@ -40,7 +43,7 @@ public class CPlusPlusCompilerExecutor implements BuildExecutor {
              }
 
             // Specify the output file path
-            outputFilePath = projectId + ".out";
+            outputFilePath = projectId;
         } else {
             // Handle the case where source code file is not provided
             System.out.println("Error: Source code file not specified.");
@@ -48,7 +51,7 @@ public class CPlusPlusCompilerExecutor implements BuildExecutor {
     }
 
     @Override
-    public void executeBuild(BuildRequest request) throws IOException, InterruptedException {
+   public void executeBuild(BuildRequest request) throws IOException, InterruptedException {
         if (compilerPath != null) {
             // Construct the command line
             String compilerCommand = "g++";
@@ -67,24 +70,20 @@ public class CPlusPlusCompilerExecutor implements BuildExecutor {
             commandList.add("-o");
             commandList.add(outputFilePath);
 
-            ProcessBuilder builder = new ProcessBuilder().command(commandList);
+            ProcessBuilder builder = new ProcessBuilder(commandList);
             builder.directory(new File("."));
 
-            try {
-                Process process = builder.start();
-
-                // Capture and handle compiler output
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
-                }
-
-                // Wait for the compiler to finish
-                process.waitFor();
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
+            Process process = builder.start();
+            String outputError = new String(process.getErrorStream().readAllBytes());
+            process.waitFor();
+            BuildResult result;
+            if(outputError.equals("")){
+                result = new BuildResult(request.getProjectId(), true, outputError);
+            }else{
+                result = new BuildResult(request.getProjectId(), false, outputError);
             }
+            this.buildResultSubject.publishBuildResult(result);
+
         } else {
             System.out.println("Error: Compiler path is not specified.");
         }
