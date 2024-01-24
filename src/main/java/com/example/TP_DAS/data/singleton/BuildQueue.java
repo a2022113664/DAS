@@ -5,6 +5,7 @@ import com.example.TP_DAS.data.BuildResult;
 import com.example.TP_DAS.data.observer.BuildResultSubject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -38,12 +39,23 @@ public class BuildQueue {
         queue.add(request);
     }
 
+
+
     public BuildRequest poll() {
         return queue.poll();
     }
 
     public void completeBuild(BuildRequest request) {
         completedBuilds.add(request);
+    }
+
+    public void removeBuild(String projectId) {
+        Iterator<BuildRequest> iterator = completedBuilds.iterator();
+        for (BuildRequest request : completedBuilds) {
+            if (request.getProjectId().equals(projectId)) {
+                iterator.remove();
+            }
+        }
     }
 
     public List<BuildRequest> getCompletedBuilds() {
