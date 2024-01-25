@@ -48,6 +48,7 @@
             <td th:text="${project.buildConfiguration}"></td>
             <td>
                 <a th:href="@{'/builds/' + ${project.projectId} + '/results'}" class="btn btn-primary">Build</a>
+                <a th:href="@{'/builds/' + ${project.projectId} + '/remove'}" class="btn btn-primary">Remove</a>
             </td>
         </tr>
         </tbody>

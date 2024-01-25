@@ -21,14 +21,15 @@ public class CCompilerExecutor implements BuildExecutor {
     private String outputFilePath;
 
     private BuildQueue buildQueue;
-    private BuildResultSubject buildResultSubject = new BuildResultSubject();
 
-    public CCompilerExecutor(){
+    public CCompilerExecutor() {
         this.buildQueue = BuildQueue.getInstance();
     }
+
     public void configure(String projectId, String language, String buildConfiguration, File sourceCodeFile) {
         // Extract compiler path from system environment variables
-        compilerPath = System.getenv("CC");;
+        compilerPath = System.getenv("CC");
+        ;
 
         // Check if the source code file is provided
         if (sourceCodeFile != null) {
@@ -44,10 +45,10 @@ public class CCompilerExecutor implements BuildExecutor {
             }
 
             // Convert the list of relative file paths to absolute paths
-           // List<String> absoluteSourceFilePaths = new ArrayList<>();
-           // for (String filePath : sourceFilePaths) {
-           //     absoluteSourceFilePaths.add(new File(sourceCodeFilePath).toPath().resolve(filePath).toAbsolutePath().toString());
-           // }
+            // List<String> absoluteSourceFilePaths = new ArrayList<>();
+            // for (String filePath : sourceFilePaths) {
+            //     absoluteSourceFilePaths.add(new File(sourceCodeFilePath).toPath().resolve(filePath).toAbsolutePath().toString());
+            // }
 
             // Specify the output file path
             outputFilePath = projectId;
@@ -56,42 +57,46 @@ public class CCompilerExecutor implements BuildExecutor {
             System.out.println("Error: Source code file not specified.");
         }
     }
+
     @Override
     public void executeBuild(BuildRequest request) throws IOException, InterruptedException {
 
         try {
-            // Construct the command line
-            String compilerCommand = "gcc";
-            String sourceFilePath = sourceFilePaths.get(0);
+            if (compilerPath != null) {
+                // Construct the command line
+                String compilerCommand = "gcc";
+                String sourceFilePath = sourceFilePaths.get(0);
 
-            // Add individual elements to the command list
-            List<String> commandList = new ArrayList<>();
-            commandList.add(compilerCommand);
+                // Add individual elements to the command list
+                List<String> commandList = new ArrayList<>();
+                commandList.add(compilerCommand);
 
-            // Check if compilerArgs is not empty
-            if (!compilerArgs.isEmpty()) {
-                commandList.addAll(compilerArgs);
+                // Check if compilerArgs is not empty
+                if (!compilerArgs.isEmpty()) {
+                    commandList.addAll(compilerArgs);
+                }
+
+                commandList.add(sourceFilePath);
+                commandList.add("-o");
+                commandList.add(outputFilePath);
+
+                ProcessBuilder builder = new ProcessBuilder(commandList);
+                builder.directory(new File("."));
+
+                Process process = builder.start();
+                String outputError = new String(process.getErrorStream().readAllBytes());
+                process.waitFor();
+                BuildResult result;
+
+                if (outputError.equals("")) {
+                    result = new BuildResult(request.getProjectId(), true, outputError);
+                } else {
+                    result = new BuildResult(request.getProjectId(), false, outputError);
+                }
+                this.buildQueue.addResult(result);
+            } else {
+                System.out.println("Error: Compiler path is not specified.");
             }
-
-            commandList.add(sourceFilePath);
-            commandList.add("-o");
-            commandList.add(outputFilePath);
-
-            ProcessBuilder builder = new ProcessBuilder(commandList);
-            builder.directory(new File("."));
-
-            Process process = builder.start();
-            String outputError = new String(process.getErrorStream().readAllBytes());
-            process.waitFor();
-            BuildResult result;
-
-            if(outputError.equals("")){
-                result = new BuildResult(request.getProjectId(), true, outputError);
-            }else{
-                result = new BuildResult(request.getProjectId(), false, outputError);
-            }
-            this.buildQueue.addResult(result);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

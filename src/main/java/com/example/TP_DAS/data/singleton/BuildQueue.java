@@ -2,8 +2,11 @@ package com.example.TP_DAS.data.singleton;
 
 import com.example.TP_DAS.data.BuildRequest;
 import com.example.TP_DAS.data.BuildResult;
+import com.example.TP_DAS.data.factory.BuildExecutorFactory;
 import com.example.TP_DAS.data.observer.BuildResultSubject;
+import org.apache.coyote.Request;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +22,7 @@ public class BuildQueue {
     private List<BuildRequest> completedBuilds;
 
     private BuildResultSubject buildResultSubject;
+    private BuildExecutorFactory executorFactory = new BuildExecutorFactory();
 
 
     public BuildQueue() {
@@ -40,20 +44,25 @@ public class BuildQueue {
     }
 
 
-
+    public BlockingQueue<BuildRequest> getQueue(){
+        return queue;
+    }
     public BuildRequest poll() {
         return queue.poll();
     }
 
+    public void executeCompilation(BuildRequest request) throws IOException, InterruptedException {
+        this.executorFactory.getBuildExecutor(request);
+    }
     public void completeBuild(BuildRequest request) {
         completedBuilds.add(request);
     }
 
     public void removeBuild(String projectId) {
-        Iterator<BuildRequest> iterator = completedBuilds.iterator();
         for (BuildRequest request : completedBuilds) {
             if (request.getProjectId().equals(projectId)) {
-                iterator.remove();
+                completedBuilds.remove(request);
+                break;  // Assuming each project ID is unique, exit loop once found
             }
         }
     }

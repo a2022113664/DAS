@@ -3,6 +3,7 @@ package com.example.TP_DAS.data.factory;
 import com.example.TP_DAS.data.BuildRequest;
 import com.example.TP_DAS.data.BuildResult;
 import com.example.TP_DAS.data.observer.BuildResultSubject;
+import com.example.TP_DAS.data.singleton.BuildQueue;
 import com.example.TP_DAS.model.interfaces.BuildExecutor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 
@@ -17,7 +18,12 @@ public class CPlusPlusCompilerExecutor implements BuildExecutor {
     private List<String> compilerArgs = new ArrayList<>();
     private List<String> sourceFilePaths;
     private String outputFilePath;
-    private BuildResultSubject buildResultSubject = new BuildResultSubject();
+    private BuildQueue buildQueue;
+
+
+    public CPlusPlusCompilerExecutor() {
+        this.buildQueue = BuildQueue.getInstance();
+    }
 
     public void configure(String projectId, String language, String buildConfiguration, File sourceCodeFile) {
         // Extract compiler path from system environment variables
@@ -82,7 +88,7 @@ public class CPlusPlusCompilerExecutor implements BuildExecutor {
             }else{
                 result = new BuildResult(request.getProjectId(), false, outputError);
             }
-            this.buildResultSubject.publishBuildResult(result);
+            this.buildQueue.addResult(result);
 
         } else {
             System.out.println("Error: Compiler path is not specified.");

@@ -11,34 +11,41 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
 
 @Controller
 @RequestMapping("/builds")
 public class BuildController {
 
     private BuildQueue buildQueue;
-    private BuildExecutorFactory executorFactory;
 
     public BuildController() {
         this.buildQueue = BuildQueue.getInstance();
-        this.executorFactory = new BuildExecutorFactory();
     }
 
     @PostMapping
     public void submitBuild(@RequestBody BuildRequest request) {
-        try {
 
-            // Submit the build request to the executor and add it to the queue
+        try {
             buildQueue.add(request);
-            // Create the appropriate executor based on the requested language
-            BuildExecutor executor = this.executorFactory.getBuildExecutor(request);
-            buildQueue.poll();
-            buildQueue.completeBuild(request);
+            BlockingQueue<BuildRequest> allQueues = buildQueue.getQueue();
+            for (BuildRequest queue : allQueues) {
+                buildQueue.executeCompilation(queue);
+                buildQueue.completeBuild(request);
+                buildQueue.poll();
+            }
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
+
+    @GetMapping("/{projectId}/remove")
+    public String removeBuild(@PathVariable String projectId) {
+        buildQueue.removeBuild(projectId);
+        return "redirect:/builds/list";
+    }
+
 
     @GetMapping("/{projectId}/results")
     public String getResult(@PathVariable String projectId, Model model) {
