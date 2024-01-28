@@ -10,8 +10,8 @@ public class BuildResult {
         this.projectId = projectId;
         this.success = success;
         this.message = message;
-    }
 
+    }
     public String getProjectId() {
         return projectId;
     }

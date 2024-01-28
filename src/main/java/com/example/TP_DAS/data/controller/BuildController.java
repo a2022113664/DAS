@@ -11,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 @Controller
@@ -56,21 +58,49 @@ public class BuildController {
     }
 
     @GetMapping("/{projectId}/results/get")
-    public ResponseEntity<String> getResultFieldMask(@PathVariable String projectId, @RequestParam(name = "fieldMask", required = false) String fieldMaskString) {
-        BuildResult  result = buildQueue.getResults(projectId);
+    public String getResultFieldMask(
+            @PathVariable String projectId,
+            @RequestParam(name = "fieldMask", required = false) List<String> fieldMaskStrings,
+            Model model) {
 
-        String objectReturn = getField(result, fieldMaskString);
+        BuildResult result = buildQueue.getResults(projectId);
 
-        return ResponseEntity.ok(objectReturn);
+        if (result == null) {
+            return "fieldMaskResultNotFound";
+        }
+
+        List<String> objectReturnList = new ArrayList<>();
+
+        if (fieldMaskStrings != null && !fieldMaskStrings.isEmpty()) {
+            for (String fieldMaskString : fieldMaskStrings) {
+                String objectReturn = getField(result, fieldMaskString);
+                if (objectReturn != null) {
+                    objectReturnList.add(objectReturn);
+                } else {
+                    model.addAttribute("errorMessage",fieldMaskString);
+                    return "fieldMaskError";
+                }
+            }
+        } else {
+            // Se nenhum fieldMask for fornecido, retorna todos os campos, incluindo a mensagem
+            objectReturnList.add(getField(result, "projectId"));
+            objectReturnList.add(getField(result, "message"));
+            objectReturnList.add(getField(result, "success"));
+        }
+
+        model.addAttribute("resultFields", objectReturnList);
+
+        return "fieldMaskResult";
     }
-
 
     public String getField(BuildResult result, String fieldName){
         switch (fieldName) {
             case "projectId":
-                return result.getProjectId();
+                return  "<b>ProjectId:</b> " + result.getProjectId() + "<br>";
             case "message":
-                return result.getMessage();
+                return  "<b>Message:</b> " + result.getMessage() + "<br>";
+            case "success":
+                return "<b>Success:</b> " + String.valueOf(result.isSuccess())  + "<br>";
             default:
                 return null;
         }
